@@ -3,13 +3,16 @@ import cors from "cors";
 import OpenAI from "openai";
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
+// OpenAI client
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// CHAT ROUTE
 app.post("/chat", async (req, res) => {
   try {
     const message = req.body.message;
@@ -17,8 +20,14 @@ app.post("/chat", async (req, res) => {
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are Microvum Kinolot." },
-        { role: "user", content: message }
+        {
+          role: "system",
+          content: "You are Microvum Kinolot AI, a helpful assistant."
+        },
+        {
+          role: "user",
+          content: message
+        }
       ]
     });
 
@@ -31,6 +40,9 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("AI server running on http://localhost:3000");
+// ✅ IMPORTANT FIX FOR RENDER PORT
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`AI server running on port ${PORT}`);
 });
