@@ -4,25 +4,35 @@ import OpenAI from "openai";
 
 const app = express();
 
+/* ✅ REQUIRED MIDDLEWARE */
 app.use(cors());
 app.use(express.json());
 
-// OpenAI client
+/* 🔐 OPENAI CLIENT (KEY FROM RENDER ENV) */
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// CHAT ROUTE
+/* ❤️ HEALTH CHECK (optional but useful) */
+app.get("/", (req, res) => {
+  res.send("Microvum Kinolot AI is running 🚀");
+});
+
+/* 💬 CHAT ROUTE (IMPORTANT) */
 app.post("/chat", async (req, res) => {
   try {
     const message = req.body.message;
+
+    if (!message) {
+      return res.status(400).json({ error: "No message provided" });
+    }
 
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: "You are Microvum Kinolot AI, a helpful assistant."
+          content: "You are Microvum Kinolot AI, a helpful assistant created by Microvum."
         },
         {
           role: "user",
@@ -35,14 +45,17 @@ app.post("/chat", async (req, res) => {
       reply: response.choices[0].message.content
     });
 
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    console.error("AI Error:", error);
+    res.status(500).json({
+      error: "Something went wrong with AI request"
+    });
   }
 });
 
-// ✅ IMPORTANT FIX FOR RENDER PORT
+/* 🚀 IMPORTANT FOR RENDER PORT */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`AI server running on port ${PORT}`);
+  console.log(`Microvum Kinolot AI running on port ${PORT}`);
 });
